@@ -10,6 +10,12 @@
 #import "OnboardingContentViewController.h"
 @import AVKit;
 
+typedef NS_ENUM(NSInteger, skipButtonStyle) {
+    top,
+    bottom
+};
+
+
 @interface OnboardingViewController : UIViewController <UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIScrollViewDelegate, OnboardingContentViewControllerDelegate>
 
 /**
@@ -85,6 +91,12 @@
 
 
 /**
+ * @brief Determine the skip button style in the view controller, be it in top or bottom. The default value of this property is bottom style
+ */
+@property (nonatomic) skipButtonStyle preferredSkipButtonStyle;
+
+
+/**
  * @brief Determines whether or not the movie player stops playing when the view disappears.
  */
 @property (nonatomic) BOOL stopMoviePlayerWhenDisappear;
@@ -100,6 +112,48 @@
  * @brief The padding between the bottom of the screen and the bottom of the page control.
  */
 @property (nonatomic) CGFloat underPageControlPadding;
+
+
+/**
+ * @brief Determines whether or not the login button will be shown. The default value of this property is NO.
+ */
+@property (nonatomic) BOOL allowLogin;
+
+
+/**
+ * @brief A block that will be executed when the login button is pressed.
+ */
+@property (nonatomic, strong) dispatch_block_t loginHandler;
+
+
+/**
+ * @brief The login button that allows users to login to the apps.
+ */
+@property (nonatomic, strong) UIButton *loginButton;
+
+
+/**
+ * @brief Determines whether or not the login button will be shown. The default value of this property is NO.
+ */
+@property (nonatomic) BOOL allowSignUp;
+
+
+/**
+ * @brief A block that will be executed when the sign up button is pressed.
+ */
+@property (nonatomic, strong) dispatch_block_t signUpHandler;
+
+
+/**
+ * @brief The sign up button that allows users to sign up an account on the apps.
+ */
+@property (nonatomic, strong) UIButton *signUpButton;
+
+
+/**
+ * @brief The view that layout between both login and sign up button.
+ */
+@property (nonatomic, strong) UIView *separatorView;
 
 
 /**

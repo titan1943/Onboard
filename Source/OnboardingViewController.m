@@ -17,8 +17,14 @@ static CGFloat const kSkipButtonHeight = 44;
 static CGFloat const kBackgroundMaskAlpha = 0.6;
 static CGFloat const kDefaultBlurRadius = 20;
 static CGFloat const kDefaultSaturationDeltaFactor = 1.8;
+static CGFloat const kLoginButtonHeight = 44;
+static CGFloat const kSignUpButtonHeight = 44;
+static CGFloat const kBottomButtomOffset = 50;
+static CGFloat const kSeparatorViewHeight = 35;
 
-static NSString * const kSkipButtonText = @"Skip";
+static NSString * const kSkipButtonText = @"SKIP";
+static NSString * const kLoginButtonText = @"LOGIN";
+static NSString * const kSignUpButtonText = @"SIGN UP";
 
 
 @interface OnboardingViewController ()
@@ -99,7 +105,14 @@ static NSString * const kSkipButtonText = @"Skip";
     
     self.allowSkipping = NO;
     self.skipHandler = ^{};
+    self.preferredSkipButtonStyle = bottom;
     
+    self.allowLogin = NO;
+    self.loginHandler = ^{};
+
+    self.allowSignUp = NO;
+    self.signUpHandler = ^{};
+
     // Create the initial exposed components so they can be customized
     self.pageControl = [UIPageControl new];
     self.pageControl.numberOfPages = self.viewControllers.count;
@@ -110,6 +123,19 @@ static NSString * const kSkipButtonText = @"Skip";
     [self.skipButton addTarget:self action:@selector(handleSkipButtonPressed) forControlEvents:UIControlEventTouchUpInside];
     self.skipButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     
+    self.loginButton = [UIButton new];
+    [self.loginButton setTitle:kLoginButtonText forState:UIControlStateNormal];
+    [self.loginButton addTarget:self action:@selector(handleLoginButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    self.loginButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+
+    self.signUpButton = [UIButton new];
+    [self.signUpButton setTitle:kSignUpButtonText forState:UIControlStateNormal];
+    [self.signUpButton addTarget:self action:@selector(handleSignUpButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    self.signUpButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+
+    self.separatorView = [UIView new];
+    self.separatorView.backgroundColor = [UIColor whiteColor]; //default color
+
     return self;
 }
 
@@ -147,8 +173,25 @@ static NSString * const kSkipButtonText = @"Skip";
 
     self.pageVC.view.frame = self.view.frame;
     self.moviePlayerController.view.frame = self.view.frame;
-    self.skipButton.frame = CGRectMake(CGRectGetMaxX(self.view.frame) - kSkipButtonWidth, CGRectGetMaxY(self.view.frame) - self.underPageControlPadding - kSkipButtonHeight, kSkipButtonWidth, kSkipButtonHeight);
+    
+    switch (self.preferredSkipButtonStyle) {
+        case top:
+            self.skipButton.frame = CGRectMake(CGRectGetMaxX(self.view.frame) - kSkipButtonWidth, 15, kSkipButtonWidth, kSkipButtonHeight);
+            break;
+        case bottom:
+            self.skipButton.frame = CGRectMake(CGRectGetMaxX(self.view.frame) - kSkipButtonWidth, CGRectGetMaxY(self.view.frame) - self.underPageControlPadding - kSkipButtonHeight, kSkipButtonWidth, kSkipButtonHeight);
+            break;
+        default:
+            break;
+    }
+    
     self.pageControl.frame = CGRectMake(0, CGRectGetMaxY(self.view.frame) - self.underPageControlPadding - kPageControlHeight, self.view.frame.size.width, kPageControlHeight);
+    
+    self.loginButton.frame = CGRectMake(0, CGRectGetMaxY(self.view.frame) - kLoginButtonHeight, self.allowSignUp ? self.view.frame.size.width / 2 : self.view.frame.size.width, kLoginButtonHeight);
+    self.signUpButton.frame = CGRectMake(self.allowLogin ? self.view.frame.size.width / 2 : 0, CGRectGetMaxY(self.view.frame) - kLoginButtonHeight, self.allowLogin ? self.view.frame.size.width / 2 : self.view.frame.size.width, kLoginButtonHeight);
+    
+    self.separatorView.frame = CGRectMake(self.view.frame.size.width / 2, CGRectGetMaxY(self.view.frame) - (kLoginButtonHeight - (kLoginButtonHeight - kSeparatorViewHeight) / 2), 1, kSeparatorViewHeight);
+    
 }
 
 - (void)generateView {
@@ -225,6 +268,22 @@ static NSString * const kSkipButtonText = @"Skip";
         [self.view addSubview:self.skipButton];
     }
     
+    // if we allow login, setup the login button
+    if (self.allowLogin) {
+        [self.view addSubview:self.loginButton];
+    }
+
+    // if we allow sign up, setup the sign up button
+    if (self.allowSignUp) {
+        [self.view addSubview:self.signUpButton];
+    }
+    
+    if (self.allowLogin || self.allowSignUp) {
+        self.underPageControlPadding += kBottomButtomOffset;
+
+        [self.view addSubview:self.separatorView];
+    }
+    
     // if we want to fade the transitions, we need to tap into the underlying scrollview
     // so we can set ourself as the delegate, this is sort of hackish but the only current
     // solution I am aware of using a page view controller
@@ -256,6 +315,19 @@ static NSString * const kSkipButtonText = @"Skip";
         self.skipHandler();
     }
 }
+
+- (void)handleLoginButtonPressed {
+    if (self.loginHandler) {
+        self.loginHandler();
+    }
+}
+
+- (void)handleSignUpButtonPressed {
+    if (self.signUpHandler) {
+        self.signUpHandler();
+    }
+}
+
 
 - (void)setUnderPageControlPadding:(CGFloat)underPageControlPadding {
     _underPageControlPadding = underPageControlPadding;
