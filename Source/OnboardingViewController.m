@@ -280,7 +280,9 @@ static NSString * const kSignUpButtonText = @"SIGN UP";
     
     if (self.allowLogin || self.allowSignUp) {
         self.underPageControlPadding += kBottomButtomOffset;
-
+    }
+    
+    if (self.allowLogin && self.allowSignUp) {
         [self.view addSubview:self.separatorView];
     }
     
